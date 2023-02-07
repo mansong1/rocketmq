@@ -84,6 +84,7 @@ public class BrokerContainer implements IBrokerContainer {
         this.brokerContainerConfig = brokerContainerConfig;
         this.nettyServerConfig = nettyServerConfig;
         this.nettyClientConfig = nettyClientConfig;
+        
 
         this.brokerOuterAPI = new BrokerOuterAPI(nettyClientConfig);
 
