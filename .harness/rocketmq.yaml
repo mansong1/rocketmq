@@ -1,0 +1,51 @@
+pipeline:
+  name: Test Intelligence with Parallelism - RocketMQ
+  identifier: testintelligencewithparallelismrocketmq
+  projectIdentifier: martinansong
+  orgIdentifier: CI_Training
+  description: This Pipeline demonstrates using Harness Test Intelligence and Parallelization to speed up Java Maven Tests. Repository to clone https://github.com/hemanthmantri/rocketmq
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.mansong
+        repoName: rocketmq
+        build: <+input>
+  stages:
+    - stage:
+        description: ""
+        identifier: Build_and_Test
+        name: Build and Test
+        spec:
+          cloneCodebase: true
+          execution:
+            steps:
+              - step:
+                  identifier: Run_Tests_with_Intelligence
+                  name: Run Tests with Intelligence
+                  spec:
+                    language: Java
+                    buildTool: Maven
+                    args: test -Dmaven.test.failure.ignore=true -DfailIfNoTests=false -T 16C -fae
+                    runOnlySelectedTests: true
+                    preCommand: |-
+                      echo $HARNESS_STAGE_INDEX
+                      echo $HARNESS_STAGE_TOTAL
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths:
+                          - "**/*.xml"
+                    envVariables:
+                      HARNESS_STAGE_INDEX: <+strategy.iteration>
+                      HARNESS_STAGE_TOTAL: <+strategy.iterations>
+                  type: RunTests
+                  failureStrategies: []
+          platform:
+            os: Linux
+            arch: Amd64
+          runtime:
+            type: Cloud
+            spec: {}
+        strategy:
+          parallelism: 3
+        type: CI
